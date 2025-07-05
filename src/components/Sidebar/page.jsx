@@ -4,10 +4,10 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FiHome, FiHeart, FiFilm, FiUser } from "react-icons/fi";
+import { FiHome, FiHeart, FiFilm, FiUser, FiX } from "react-icons/fi";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 
-const Sidebar = ({ isCollapsed, toggleSidebar }) => {
+const Sidebar = ({ isCollapsed, toggleSidebar, isMobile = false, onClose }) => {
   const pathname = usePathname();
 
   const menuItems = [
@@ -26,46 +26,56 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
     icon: <FiUser size={18} />,
   };
 
+  const onClick = () => {
+    if (isMobile && onClose) {
+      onClose();
+    }
+  };
+
   return (
     <aside
       className={`${
-        isCollapsed ? "w-20" : "w-64"
-      } h-screen bg-[#2B2B2B] text-[#D1DCE5] flex flex-col justify-between rounded-xl p-4 m-3 transition-all duration-300 relative`}
+        isMobile ? "w-20 h-screen" : isCollapsed ? "w-20" : "w-64"
+      } h-screen bg-[#2B2B2B] text-[#D1DCE5] flex flex-col justify-between rounded-xl p-4 m-3 transition-all duration-300 ease-in-out relative`}
     >
       <div>
         <div className="mb-8 flex items-center justify-between relative">
           <div
             className={`${
-              isCollapsed
+              isCollapsed || isMobile
                 ? "flex justify-center w-full"
-                : "flex items-center gap-2"
-            }`}
+                : "flex items-center justify-center gap-2"
+            } transition-all duration-300`}
           >
             <Image
               src={
-                isCollapsed
+                isCollapsed || isMobile
                   ? "/img/logo luxina pesergi.svg"
                   : "/img/logo luxina.svg"
               }
               alt="Luxina Logo"
-              width={isCollapsed ? 30 : 120}
+              width={isCollapsed || isMobile ? 40 : 120}
               height={40}
-              className={isCollapsed ? "mr-4" : "mr-0"}
+              className={`${
+                isCollapsed || isMobile ? "mr-4" : "mr-0"
+              } transition-all duration-300`}
             />
           </div>
 
-          <button
-            onClick={toggleSidebar}
-            className={`text-gray-300 hover:text-white mt-1 focus:outline-none ${
-              isCollapsed ? "absolute top-0 right-0" : ""
-            }`}
-          >
-            {isCollapsed ? (
-              <FaAngleRight size={20} />
-            ) : (
-              <FaAngleLeft size={20} />
-            )}
-          </button>
+          {!isMobile && (
+            <button
+              onClick={toggleSidebar}
+              className={`text-gray-300 hover:text-white mt-1 focus:outline-none transition-all duration-200 ease-in-out transform hover:scale-110 ${
+                isCollapsed ? "absolute top-0 right-0" : ""
+              }`}
+            >
+              {isCollapsed ? (
+                <FaAngleRight size={20} />
+              ) : (
+                <FaAngleLeft size={20} />
+              )}
+            </button>
+          )}
         </div>
 
         <nav className="space-y-2 text-sm">
@@ -73,33 +83,43 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
             <Link
               key={item.name}
               href={item.href}
-              className={`flex items-center gap-3 p-3 rounded-xl ${
-                isCollapsed ? "justify-center" : ""
+              onClick={onClick}
+              className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105 ${
+                isCollapsed || isMobile ? "justify-center" : ""
               } ${
                 pathname.startsWith(item.href)
                   ? "bg-[#351C4D]"
                   : "hover:bg-[#303030]"
               }`}
             >
-              {item.icon}
-              {!isCollapsed && <span>{item.name}</span>}
+              <span className="transition-all duration-200">{item.icon}</span>
+              {!isCollapsed && !isMobile && (
+                <span className="transition-all duration-300">{item.name}</span>
+              )}
             </Link>
           ))}
 
-          <hr className="my-6 border-gray-600" />
+          <hr className="my-6 border-gray-600 transition-all duration-300" />
 
           <Link
             href={profileItem.href}
-            className={`flex items-center gap-3 p-3 rounded-xl ${
-              isCollapsed ? "justify-center" : ""
+            onClick={onClick}
+            className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ease-in-out transform hover:scale-105 ${
+              isCollapsed || isMobile ? "justify-center" : ""
             } ${
               pathname.startsWith(profileItem.href)
                 ? "bg-[#351C4D]"
                 : "hover:bg-[#303030]"
             }`}
           >
-            {profileItem.icon}
-            {!isCollapsed && <span>{profileItem.name}</span>}
+            <span className="transition-all duration-200">
+              {profileItem.icon}
+            </span>
+            {!isCollapsed && !isMobile && (
+              <span className="transition-all duration-300">
+                {profileItem.name}
+              </span>
+            )}
           </Link>
         </nav>
       </div>
