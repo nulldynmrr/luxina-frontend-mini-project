@@ -1,36 +1,183 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Luxina - Website Booking Film 
 
-## Getting Started
+Project ini bertujuan untuk belajar dan menerapkan konsep REST API menggunakan Next.js, Supabase, dan TMDB API. Aplikasi ini menampilkan data film dari TMDB dan pengguna bisa login, menyimpan watchlist, dan memesan tiket bioskop.
 
-First, run the development server:
+## Fitur Utama
+
+- Autentikasi user (signup/login) dengan Supabase
+- Generate kode unik untuk setiap user (format: LXN001, LXN002, ...)
+- Menampilkan daftar film populer dari TMDB API
+- Menampilkan Video Trailer dari TMDB dihubungkan dengan Youtube
+- Menyimpan dan mengelola watchlist film per user
+- Sistem pemesanan tiket bioskop (pilih bioskop, jam, kursi, dll)
+- Status tiket: ACTIVE, CANCELED, USED
+- Website Responsive
+
+## Target Pembelajaran
+
+- Menggunakan REST API (TMDB API) untuk fetch data
+- Menggunakan API Supabase untuk login, insert, update, delete data
+- Menerapkan RLS (Row Level Security) untuk keamanan data per user
+- Menghubungkan frontend (Next.js) dengan backend (API eksternal & Supabase)
+
+## Tools & Framework
+
+- [Next.js](https://nextjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Supabase](https://supabase.com/) (Auth + Database)
+- [TMDB API](https://developer.themoviedb.org/reference/intro/authentication)
+- [Vercel](https://vercel.com/) (Deploy)
+
+## Struktur Database (Supabase)
+
+#### Tabel: `users`
+
+```sql
+CREATE TABLE public.users (
+  id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  code TEXT UNIQUE,
+  full_name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  password TEXT NOT NULL,
+  phone_number TEXT,
+  membership TEXT CHECK (membership IN ('VIP', 'MEMBER', 'REGULAR')) DEFAULT 'REGULAR',
+  avatar_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+```
+Fungsi function generate_user_code() untuk membuat user code dengan fromat LXN001,LXN002,...
+
+```sql
+CREATE OR REPLACE FUNCTION generate_user_code()
+RETURNS TRIGGER AS $$
+DECLARE
+  new_code TEXT;
+  last_code TEXT;
+  last_number INT;
+BEGIN
+  -- ambil code terakhir
+  SELECT code INTO last_code
+  FROM public.users
+  WHERE code LIKE 'LXN%'
+  ORDER BY created_at DESC
+  LIMIT 1;
+
+  -- urutan nomor
+  IF last_code IS NOT NULL THEN
+    last_number := CAST(SUBSTRING(last_code FROM 4) AS INT);
+  ELSE
+    last_number := 0;
+  END IF;
+
+  new_code := 'LXN' || LPAD((last_number + 1)::TEXT, 3, '0');
+  NEW.code := new_code;
+
+  -- Enkripsi password
+  NEW.password := crypt(NEW.password, gen_salt('bf'));
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_user_code
+BEFORE INSERT ON public.users
+FOR EACH ROW
+WHEN (NEW.code IS NULL OR NEW.password IS NOT NULL)
+EXECUTE FUNCTION generate_user_code();
+```
+
+#### Tabel: `cinemas`
+
+```sql
+create table public.cinemas (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  location text not null,
+  studio_name text not null,
+  seats integer not null check (seats > 0),
+  seat_rows text[] default array[]::text[],
+  seat_numbers integer[] default array[]::integer[],
+  excluded_seats text[] default array[]::text[],
+  booked_seats text[] default array[]::text[],
+  time_list jsonb default '[]',
+  created_at timestamp with time zone default now()
+);
+```
+
+#### Tabel: `ticket_orders`
+
+```sql
+create table public.ticket_orders (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.users(id) on delete cascade,
+  movie_id text not null,
+  movie_title text not null,
+  show_date date not null,
+  show_time time not null,
+  cinema_id uuid not null references public.cinemas(id) on delete cascade,
+  cinema_name text,
+  studio_name text,
+  location text,
+  people integer not null check (people > 0),
+  seats text[] not null,
+  total_price integer not null check (total_price >= 0),
+  status text check (status in ('ACTIVE', 'CANCELED', 'USED')) default 'ACTIVE',
+  created_at timestamp with time zone default now()
+);
+```
+
+### Tabel: `watchlist`
+
+``` sql
+create table watchlist (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) not null,
+  movie_id bigint not null,
+  movie_title text not null,
+  movie_poster text,
+  created_at timestamp with time zone default now()
+);
+```
+
+## Setup Project
+
+### 1. Clone repository
+
+```bash
+git clone https://github.com/nulldynmrr/luxina-frontend-mini-project.git
+cd nama-repo
+npm install
+```
+
+### 2. Tambahkan file `.env`
+
+Buat file `.env` di root folder dan isi dengan:
+
+```env
+// api tmdb
+NEXT_PUBLIC_APIKEY = your_apikey_tmdb
+NEXT_PUBLIC_BASEURL= your_baseurl_tmdb
+NEXT_PUBLIC_BASEIMGURL = your_baseimgurl_tmdb
+NEXT_PUBLIC_TOKEN = your_toke_tmdb
+
+// api supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_ANON_KEY=your_anon_key
+```
+
+### 3. Jalankan Project
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 4. Akun Demo
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Gunakan akun untuk melakukan percobaan login dan fitur pemesanan:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
+📧 Email   : `andisaputra@example.com`  
+🔐 Password: `andisaputra123`
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
