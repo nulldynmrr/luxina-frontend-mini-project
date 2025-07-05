@@ -15,10 +15,22 @@ import supabase from "@/config/supabaseClient";
 import { getMovieList } from "@/lib/api";
 
 const formSchema = z.object({
-  full_name: z.string().min(1, "Nama wajib diisi"),
-  email: z.string().email("Email tidak valid"),
-  password: z.string().min(6, "Password minimal 6 karakter"),
-  phone_number: z.string().min(8, "Nomor HP tidak valid"),
+  full_name: z
+    .string()
+    .regex(/^[a-zA-Z\s]+$/, "Nama hanya boleh huruf dan spasi")
+    .min(2, "Nama minimal 2 karakter")
+    .min(1, "Nama wajib diisi"),
+  email: z.string().email("Email tidak valid").min(1, "Email wajib diisi"),
+  password: z
+    .string()
+    .min(8, "Password minimal 8 karakter")
+    .min(1, "Password Wajib diisi"),
+  phone_number: z
+    .string()
+    .max(15, "Nomor HP terlalu panjang")
+    .regex(/^(\+62|08)[0-9]{7,14}$/, "Gunakan format +62 atau 08")
+    .min(8, "Nomor HP tidak valid")
+    .min(1, "Nomor Telepon Wajib diisi"),
 });
 
 const BASEIMGURL = process.env.NEXT_PUBLIC_BASEIMGURL;
@@ -50,10 +62,10 @@ const Signup = () => {
 
     if (!result.success) {
       const errors = {};
-      resulr.error.errors.forEach((err) => {
+      result.error.errors.forEach((err) => {
         errors[err.path[0]] = err.message;
       });
-      setErrors(erros);
+      setErrors(errors);
       return;
     }
 
@@ -74,11 +86,18 @@ const Signup = () => {
         return;
       }
 
-      // save data ke tabel users
+      if (!authData?.user?.id) {
+        toast.error("Gagal mendapatkan data user dari Supabase.");
+        return;
+      }
+
+      const userId = authData.user.id;
+
+      // save data ke tabel users dan ubah password
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const { error: insertError } = await supabase.from("users").insert({
-        id: authData.user.id,
+        id: userId,
         full_name,
         email,
         phone_number,
@@ -86,13 +105,19 @@ const Signup = () => {
       });
 
       if (insertError) {
-        toast.error("Gagal menyimpan user: " + insertError.message);
-      } else {
-        toast.success("Pendaftaran berhasil!");
-        router.push("/login");
+        if (error.message.includes("User already registered")) {
+          toast.error("Email sudah terdaftar. Silakan login.");
+        } else {
+          toast.error("Gagal daftar: " + error.message);
+        }
+        return;
       }
+
+      toast.success("Pendaftaran berhasil!");
+      router.push("/login");
     } catch (err) {
-      toast.error("Terjadi kesalahan.");
+      console.error("Error saat daftar:", err);
+      toast.error("Terjadi kesalahan internal.");
     }
   };
 
@@ -165,7 +190,7 @@ const Signup = () => {
           Nikmati kemudahan booking tiket kapan saja dan dimana saja.
         </p>
 
-        <form onSubmit={onSubmit} className="space-y-4 my-4">
+        <form onSubmit={onSubmit} className="space-y-2 my-4">
           <input
             name="full_name"
             type="text"
@@ -174,6 +199,11 @@ const Signup = () => {
             placeholder="Masukkan Nama Lengkap"
             className="w-full px-4 py-3 font-light bg-[#262132] text-white rounded-md outline-none placeholder-[#A9B2BC]"
           />
+          {errors.full_name && (
+            <p className="font-thin text-sm text-white mt-2">
+              {errors.full_name}
+            </p>
+          )}
           <input
             name="email"
             type="email"
@@ -182,6 +212,9 @@ const Signup = () => {
             placeholder="Masukkan Email"
             className="w-full px-4 py-3 font-light bg-[#262132] text-white rounded-md outline-none placeholder-[#A9B2BC]"
           />
+          {errors.email && (
+            <p className="font-thin text-sm text-white mt-2">{errors.email}</p>
+          )}
           <input
             name="password"
             type="password"
@@ -190,6 +223,11 @@ const Signup = () => {
             placeholder="Masukkan Password"
             className="w-full px-4 py-3 font-light bg-[#262132] text-white rounded-md outline-none placeholder-[#A9B2BC]"
           />
+          {errors.password && (
+            <p className="font-thin text-sm text-white mt-2">
+              {errors.password}
+            </p>
+          )}
           <input
             name="phone_number"
             type="phone"
@@ -198,6 +236,11 @@ const Signup = () => {
             placeholder="Masukkan nomor handphone"
             className="w-full px-4 py-3 font-light bg-[#262132] text-white rounded-md outline-none placeholder-[#A9B2BC]"
           />
+          {errors.phone_number && (
+            <p className="font-thin text-sm text-white mt-2">
+              {errors.phone_number}
+            </p>
+          )}
           <button
             type="submit"
             className="w-full py-3 bg-[#4A2075] hover:bg-[#4a1784] transition-colors rounded-md text-white font-medium"
