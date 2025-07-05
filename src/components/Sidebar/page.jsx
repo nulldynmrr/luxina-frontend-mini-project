@@ -12,8 +12,12 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
 
   const menuItems = [
     { name: "Dashboard", href: "/dashboard", icon: <FiHome size={18} /> },
-    { name: "My Wishlist", href: "/wishlist", icon: <FiHeart size={18} /> },
-    { name: "My Ticket", href: "/ticket", icon: <FiFilm size={18} /> },
+    {
+      name: "My Watchlist",
+      href: "/my-watchlist",
+      icon: <FiHeart size={18} />,
+    },
+    { name: "My Ticket", href: "/my-ticket", icon: <FiFilm size={18} /> },
   ];
 
   const profileItem = {
