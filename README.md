@@ -28,6 +28,9 @@ Project ini bertujuan untuk belajar dan menerapkan konsep REST API menggunakan N
 - [TMDB API](https://developer.themoviedb.org/reference/intro/authentication)
 - [Vercel](https://vercel.com/) (Deploy)
 
+## Link Demo
+[Luxina | Website Booking Film](https://luxina-dinarmakbar.vercel.app/dashboard)
+
 ## Struktur Database (Supabase)
 
 #### Tabel: `users`
