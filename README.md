@@ -25,7 +25,7 @@ Project ini bertujuan untuk belajar dan menerapkan konsep REST API menggunakan N
 - [Next.js](https://nextjs.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Supabase](https://supabase.com/) (Auth + Database)
-- [TMDB API](https://developer.themoviedb.org/)
+- [TMDB API](https://developer.themoviedb.org/reference/intro/authentication)
 - [Vercel](https://vercel.com/) (Deploy)
 
 ## Struktur Database (Supabase)
