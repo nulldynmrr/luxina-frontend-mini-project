@@ -17,8 +17,7 @@ Project ini bertujuan untuk belajar dan menerapkan konsep REST API menggunakan N
 
 - Menggunakan REST API (TMDB API) untuk fetch data
 - Menggunakan API Supabase untuk login, insert, update, delete data
-- Menerapkan RLS (Row Level Security) untuk keamanan data per user
-- Menghubungkan frontend (Next.js) dengan backend (API eksternal & Supabase)
+- Menghubungkan frontend dengan backend (API eksternal & Supabase)
 
 ## Tools & Framework
 
