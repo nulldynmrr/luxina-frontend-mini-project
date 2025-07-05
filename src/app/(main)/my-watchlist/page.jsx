@@ -67,15 +67,8 @@ const MyWatchlist = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white">
+      <div className="flex items-center justify-center text-4xl text-bold mt-8 text-[#3d3d3d]">
         Loading...
-      </div>
-    );
-  }
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        {error}
       </div>
     );
   }
