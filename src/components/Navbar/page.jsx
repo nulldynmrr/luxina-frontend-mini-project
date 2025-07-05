@@ -104,7 +104,7 @@ const Navbar = ({ onHamburgerClick }) => {
   }, []);
 
   return (
-    <nav className="w-full flex items-center justify-between rounded-lg relative transition-all duration-300 ease-in-out">
+    <nav className="mt-4 w-full flex items-center justify-between rounded-lg relative transition-all duration-300 ease-in-out">
       <button
         onClick={onHamburgerClick}
         className="md:hidden flex items-center justify-center w-10 h-10 bg-[#2C2C2C] rounded-lg text-white hover:bg-[#3a3a3a] transition-all duration-200 ease-in-out transform hover:scale-105"
