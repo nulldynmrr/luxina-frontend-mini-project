@@ -16,6 +16,8 @@ const ProfilePage = () => {
     phone_number: "",
     membership: "",
     id: "",
+    code: "",
+    avatar_url: "",
   });
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
@@ -37,7 +39,9 @@ const ProfilePage = () => {
       }
       const { data, error: fetchError } = await supabase
         .from("users")
-        .select("id, full_name, email, phone_number, membership")
+        .select(
+          "id, full_name, email, phone_number, membership, code, avatar_url"
+        )
         .eq("id", user.id)
         .single();
       if (fetchError || !data) {
@@ -52,6 +56,8 @@ const ProfilePage = () => {
         phone_number: data.phone_number || "",
         membership: data.membership || "VIP",
         id: data.id || "",
+        code: data.code,
+        avatar_url: data.avatar_url,
       });
       setLoading(false);
     };
@@ -134,7 +140,7 @@ const ProfilePage = () => {
         <div className="bg-[#232323] rounded-2xl flex items-center px-8 py-6 justify-between">
           <div className="flex items-center gap-6">
             <img
-              src="/img/Avatar.png"
+              src={form.avatar_url || "/img/Avatar.png"}
               alt="Avatar"
               className="w-20 h-20 rounded-full object-cover"
             />
@@ -150,12 +156,14 @@ const ProfilePage = () => {
             onClick={buttonEdit}
             disabled={editMode}
           >
-            edit <FiEdit2 size={20} />
+            <span className="hidden md:block">edit </span> <FiEdit2 size={20} />
           </button>
         </div>
         <div className="bg-[#232323] rounded-2xl px-8 py-8 grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-4">
           <div>
-            <label className="block text-gray-400 text-sm mb-1">Nomor ID</label>
+            <label className="block text-gray-400 text-sm mb-1">
+              Nomor ID - {form.code}
+            </label>
             <input
               className="bg-transparent text-xl font-semibold mb-4 w-full outline-none py-4"
               value={form.id}
