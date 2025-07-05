@@ -151,7 +151,7 @@ npm install
 
 ### 2. Tambahkan file `.env`
 
-Buat file `.env.` di root folder dan isi dengan:
+Buat file `.env` di root folder dan isi dengan:
 
 ```env
 // api tmdb
