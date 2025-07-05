@@ -126,7 +126,7 @@ const Navbar = ({ onHamburgerClick }) => {
           />
         </button>
         <div
-          className={`absolute mt-2 py-2 bg-[#2C2C2C] text-sm text-[#797F82] rounded-md shadow-lg max-h-64 overflow-y-auto w-40 transition-all duration-200 ease-in-out ${
+          className={`absolute mt-12 py-2 bg-[#2C2C2C] text-sm text-[#797F82] rounded-md shadow-lg w-40 transition-all duration-200 ease-in-out z-50 ${
             countryDropDown
               ? "opacity-100 translate-y-0"
               : "opacity-0 -translate-y-2 pointer-events-none"
@@ -135,13 +135,13 @@ const Navbar = ({ onHamburgerClick }) => {
           {countryList
             .filter((c) => !country || c.code !== country.code)
             .map((c) => (
-              <li
+              <div
                 key={c.code === null ? "all" : c.code}
                 onClick={() => buttonCountry(c)}
                 className="mx-2 rounded-sm px-4 py-2 hover:bg-[#3a3a3a] cursor-pointer transition-colors duration-200"
               >
                 {c.label}
-              </li>
+              </div>
             ))}
         </div>
       </div>
@@ -153,7 +153,7 @@ const Navbar = ({ onHamburgerClick }) => {
             placeholder="Search movies ..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full text-sm bg-[#2C2C2C] text-[#fefefe] placeholder-gray-400 px-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-[#4A2075] transition-all duration-200"
+            className="w-full text-sm bg-[#2C2C2C] text-[#fefefe] placeholder-gray-400 px-4 py-3 rounded-full outline-none transition-all duration-200"
           />
           <FiSearch
             onClick={buttonSearch}

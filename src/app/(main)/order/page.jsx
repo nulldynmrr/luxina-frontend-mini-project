@@ -300,20 +300,22 @@ const Order = () => {
     <div className="min-h-screen w-full">
       <div className="w-full space-y-4">
         {movie && (
-          <div className="flex flex-col md:flex-row gap-6 items-center mb-6 min-h-[20rem]">
+          <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-center mb-4 md:mb-6 min-h-[16rem] md:min-h-[20rem]">
             <img
               src={process.env.NEXT_PUBLIC_BASEIMGURL + movie.poster_path}
               alt={movie.title}
-              className="w-56 h-80 object-cover rounded-xl"
+              className="w-40 h-56 md:w-56 md:h-80 object-cover rounded-xl"
             />
-            <div className="flex-1 flex flex-col justify-center h-full">
-              <h2 className="text-4xl font-bold mb-4">{movie.title}</h2>
-              <div className="flex gap-2 mb-2 flex-wrap">
+            <div className="flex-1 flex flex-col justify-center h-full px-4 md:px-0">
+              <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">
+                {movie.title}
+              </h2>
+              <div className="flex gap-1 md:gap-2 mb-2 flex-wrap">
                 {movie.genres && movie.genres.length > 0
                   ? movie.genres.map((g) => (
                       <span
                         key={g.id}
-                        className="bg-[#2C2C2C] px-3 py-1 rounded-full text-xs text-gray-300"
+                        className="bg-[#2C2C2C] px-2 md:px-3 py-1 rounded-full text-xs text-gray-300"
                       >
                         {g.name}
                       </span>
@@ -322,14 +324,16 @@ const Order = () => {
                     movie.genre_ids.map((g) => (
                       <span
                         key={g}
-                        className="bg-[#2C2C2C] px-3 py-1 rounded-full text-xs text-gray-300"
+                        className="bg-[#2C2C2C] px-2 md:px-3 py-1 rounded-full text-xs text-gray-300"
                       >
                         {genreMap[g] || g}
                       </span>
                     ))}
               </div>
-              <p className="text-gray-300 mb-2 max-w-2xl">{movie.overview}</p>
-              <div className="flex gap-4 text-sm text-gray-400 items-center mb-6">
+              <p className="text-gray-300 mb-2 max-w-2xl text-sm md:text-base line-clamp-3 md:line-clamp-none">
+                {movie.overview}
+              </p>
+              <div className="flex gap-2 md:gap-4 text-xs md:text-sm text-gray-400 items-center mb-4 md:mb-6 flex-wrap">
                 <span>{movie.original_language?.toUpperCase()}</span>
                 <span className="text-[#D5AE00] flex items-center gap-1">
                   <FaStar size={16} color="#D5AE00" />
@@ -339,18 +343,18 @@ const Order = () => {
                 <span>{movie.adult ? "18+" : "All ages"}</span>
                 <span>{movie.runtime ? `${movie.runtime} min` : ""}</span>
               </div>
-              <div className="flex gap-4 mt-2">
+              <div className="flex gap-2 md:gap-4 mt-2 flex-col sm:flex-row">
                 <button
-                  className="flex items-center gap-2 bg-[#F3F3F3] text-[#232226] font-semibold px-6 py-3 rounded-full text-base"
-                  onClick={() =>
-                    (window.location.href = `/trailer?id=${movie.id}`)
-                  }
+                  className="flex items-center justify-center gap-2 bg-[#F3F3F3] text-[#232226] font-semibold px-4 md:px-6 py-2 md:py-3 rounded-full text-sm md:text-base"
+                  onClick={() => {
+                    window.location.href = `/trailer?id=${movie.id}`;
+                  }}
                 >
                   <FaPlay size={18} color="#4A2075" />
                   Watch Trailer
                 </button>
                 <button
-                  className="flex items-center gap-2 border border-[#F3F3F3] text-[#F3F3F3] font-semibold px-6 py-3 rounded-full text-base"
+                  className="flex items-center justify-center gap-2 border border-[#F3F3F3] text-[#F3F3F3] font-semibold px-4 md:px-6 py-2 md:py-3 rounded-full text-sm md:text-base"
                   onClick={buttonWishlist}
                 >
                   <FaHeart size={18} color="#F3F3F3" />
@@ -360,7 +364,7 @@ const Order = () => {
             </div>
           </div>
         )}
-        <p className="my-2">Order</p>
+        <p className="my-2 px-4 md:px-0">Order</p>
         <CardOrder
           key={selectedCinema?.id}
           date={dateList}
@@ -380,39 +384,41 @@ const Order = () => {
           onPeopleChange={onPeopleChange}
         />
 
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          <div className="w-full md:w-4/6 flex flex-col items-center bg-[#1C1C1C] rounded-2xl p-6">
+        <div className="flex flex-col lg:flex-row gap-4 mb-8 px-4 md:px-0">
+          <div className="w-full lg:w-4/6 flex flex-col items-center bg-[#1C1C1C] rounded-2xl p-4 md:p-6">
             <h3 className="text-sm mb-4 text-gray-400">Seating</h3>
-            <div className="mb-6">
-              <CardSeats
-                seatRows={seatRows}
-                seatNumbers={seatNumbers}
-                excludedSeats={excludedSeats}
-                bookedSeats={bookedSeats}
-                selectedSeats={selectedSeats}
-                onSeatClick={toggleSeat}
-              />
+            <div className="mb-4 md:mb-6 w-full overflow-x-auto">
+              <div className="min-w-[320px] md:min-w-0">
+                <CardSeats
+                  seatRows={seatRows}
+                  seatNumbers={seatNumbers}
+                  excludedSeats={excludedSeats}
+                  bookedSeats={bookedSeats}
+                  selectedSeats={selectedSeats}
+                  onSeatClick={toggleSeat}
+                />
+              </div>
             </div>
             <div className="w-full h-2 bg-gray-700 rounded-full mb-2" />
             <span className="text-xs text-gray-400 mb-4">screen</span>
-            <div className="flex justify-center">
-              <div className="flex items-center gap-8 bg-[#232226] rounded-full px-8 py-2">
+            <div className="flex justify-center w-full">
+              <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-8 bg-[#232226] rounded-full px-4 md:px-8 py-2 text-xs md:text-base">
                 <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded bg-[#232226]" />
-                  <span className="text-gray-300 text-base">available</span>
+                  <div className="w-4 h-4 md:w-5 md:h-5 rounded bg-[#232226]" />
+                  <span className="text-gray-300">available</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded bg-[#F3F3F3]" />
-                  <span className="text-gray-300 text-base">unavailable</span>
+                  <div className="w-4 h-4 md:w-5 md:h-5 rounded bg-[#F3F3F3]" />
+                  <span className="text-gray-300">unavailable</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded bg-[#4A2075]" />
-                  <span className="text-gray-300 text-base">your choice</span>
+                  <div className="w-4 h-4 md:w-5 md:h-5 rounded bg-[#4A2075]" />
+                  <span className="text-gray-300">your choice</span>
                 </div>
               </div>
             </div>
           </div>
-          <div className="w-full md:w-2/6 bg-[#1C1C1C] rounded-2xl p-6 ">
+          <div className="w-full lg:w-2/6 bg-[#1C1C1C] rounded-2xl p-4 md:p-6">
             <div className="w-full">
               <CardDetailOrder
                 date={dateStr}
