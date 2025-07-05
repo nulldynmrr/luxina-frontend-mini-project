@@ -23,6 +23,9 @@ const Trailer = () => {
   const [images, setImages] = useState([]);
   const [credits, setCredits] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [videoKey, setVideoKey] = useState(null);
+  const [isMuted, setIsMuted] = useState(true);
+  const iframeRef = useRef(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -46,6 +49,21 @@ const Trailer = () => {
   const trailer = videos.find(
     (v) => v.type === "Trailer" && v.site === "YouTube"
   );
+
+  useEffect(() => {
+    if (trailer) {
+      setVideoKey(trailer.key);
+    }
+  }, [trailer]);
+
+  useEffect(() => {
+    if (videoKey && isMuted) {
+      const timer = setTimeout(() => {
+        setIsMuted(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [videoKey, isMuted]);
 
   const buttonWishlist = async () => {
     // get current user
@@ -109,14 +127,23 @@ const Trailer = () => {
     <div className="min-h-screen bg-[#212121] text-white">
       <div className="relative w-full h-[320px] md:h-[420px] rounded-3xl overflow-hidden mb-8">
         {/* BACKDROP */}
-        {trailer ? (
+        {trailer && videoKey ? (
           <iframe
-            src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1&loop=1&playlist=${trailer.key}`}
+            ref={iframeRef}
+            key={`${videoKey}-${isMuted}`}
+            src={`https://www.youtube.com/embed/${videoKey}?autoplay=1&mute=${
+              isMuted ? 1 : 0
+            }&loop=1&playlist=${videoKey}&controls=0&rel=0&showinfo=0&modestbranding=1&enablejsapi=1&origin=${
+              window.location.origin
+            }`}
             title="YouTube trailer"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
             className="absolute left-1/2 top-1/2 w-[150%] h-[150%] -translate-x-1/2 -translate-y-1/2 scale-150 object-cover object-center rounded-3xl border-0 z-0"
             style={{ transformOrigin: "center" }}
+            onLoad={() => {
+              console.log("Video loaded successfully");
+            }}
           />
         ) : (
           <img
@@ -132,13 +159,13 @@ const Trailer = () => {
           <h1 className="text-4xl font-bold mb-2 md:mb-0">{movie.title}</h1>
           <div className="flex gap-4">
             <button
-              className="flex items-center gap-2 border border-[#F3F3F3] text-[#F3F3F3] font-semibold px-6 py-3 rounded-full text-base bg-transparent hover:bg-[#4A2075] hover:text-white hover:border-[#4A2075] hover:scale-105 transition-all duration-200"
+              className="flex items-center gap-2 border border-[#F3F3F3] text-[#F3F3F3] font-semibold px-4 py-2 md:px-6 md:py-3 rounded-full text-base bg-transparent hover:bg-[#4A2075] hover:text-white hover:border-[#4A2075] hover:scale-105 transition-all duration-200"
               onClick={() => router.push(`/order?movieId=${movie.id}`)}
             >
               <IoTicket size={20} className="-ml-1" /> Order Now
             </button>
             <button
-              className="group flex items-center gap-2 border border-[#F3F3F3] text-[#F3F3F3] font-semibold px-6 py-3 rounded-full text-base bg-transparent hover:bg-[#F3F3F3] hover:text-[#4A2075] hover:border-[#F3F3F3] hover:scale-105 transition-all duration-200"
+              className="group flex items-center gap-2 border border-[#F3F3F3] text-[#F3F3F3] font-semibold px-4 py-2 md:px-6 md:py-3 rounded-full text-base bg-transparent hover:bg-[#F3F3F3] hover:text-[#4A2075] hover:border-[#F3F3F3] hover:scale-105 transition-all duration-200"
               onClick={buttonWishlist}
             >
               <FaHeart
