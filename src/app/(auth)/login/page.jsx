@@ -68,18 +68,6 @@ const Login = () => {
         return;
       }
 
-      // Ambil data user dari tabel users
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", authData.user.id)
-        .single();
-
-      if (userError) {
-        toast.error("Gagal mengambil data user: " + userError.message);
-        return;
-      }
-
       toast.success("Login berhasil!");
       router.push("/dashboard");
     } catch (err) {
